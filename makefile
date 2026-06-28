@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -pedantic
 
-SRC = main.c chunk.c memory.c debug.c
+SRC = main.c chunk.c memory.c debug.c value.c
 OBJ = $(SRC:.c=.o)
 TARGET = clox
 
