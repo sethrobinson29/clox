@@ -78,10 +78,18 @@ static void skipWhitespace() {
 			advance();
 			break;
 		case '/':
-			// TODO: multiline comments
 			if (peekNext() == '/') {
 				while (peek() != '\n' && !isAtEnd())
 					advance();
+			} else if (peekNext() == '*') {
+				while (!isAtEnd()) {
+					if (peek() == '*' && peekNext() == '/') {
+						advance(); advance();
+						break;
+					}
+					if (peek() == '\n') scanner.line++;
+					advance();
+				}
 			} else {
 				return;
 			}
