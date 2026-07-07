@@ -1,5 +1,4 @@
 #include "value.h"
-#include "object.h"
 #include "memory.h"
 #include "object.h"
 #include <stdio.h>
@@ -49,8 +48,7 @@ void printValue(Value value) {
 }
 
 bool valuesEqual(Value a, Value b) {
-	if (a.type != b.type)
-		return false;
+	if (a.type != b.type) { return false; }
 	switch (a.type) {
 		case VAL_BOOL: {
 			return AS_BOOL(a) == AS_BOOL(b);
@@ -62,9 +60,7 @@ bool valuesEqual(Value a, Value b) {
 			return AS_NUMBER(a) == AS_NUMBER(b);
 		}
 		case VAL_OBJ: {
-			ObjString *aString = AS_STRING(a);
-			ObjString *bString = AS_STRING(b);
-			return aString->length == bString->length && memcmp(aString->chars, bString->chars, aString->length) == 0;
+			return AS_OBJ(a) == AS_OBJ(b);
 		}
 		default: {
 			return false; // Unreachable.}

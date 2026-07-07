@@ -28,9 +28,13 @@ static void runtimeError(const char *format, ...) {
 void initVM() {
 	resetStack();
 	vm.objects = NULL;
+	initTable(&vm.strings);
 }
 
-void freeVM() { freeObjects(); }
+void freeVM() {
+	freeTable(&vm.strings);
+	freeObjects();
+}
 
 void push(Value value) {
 	*vm.stackTop = value;
@@ -110,8 +114,12 @@ static InterpretResult run() {
 				push(BOOL_VAL(valuesEqual(a, b)));
 				break;
 			}
-			case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
-			case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
+			case OP_GREATER:
+				BINARY_OP(BOOL_VAL, >);
+				break;
+			case OP_LESS:
+				BINARY_OP(BOOL_VAL, <);
+				break;
 			case OP_ADD: {
 				if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
 					concatenate();
