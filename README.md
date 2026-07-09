@@ -8,3 +8,5 @@ Lox is a dynamically typed scripting language built across the book. The book im
 This repo implements the VM in C as the book does, while tackling some of the challenges issued at the end of each chapter. Challenges include:
 
 - String Interpolation
+- Exposes hash tables to end users (eventually)
+	- Numbers, Booleans, nil, and Objects (eventually) as hash keys
