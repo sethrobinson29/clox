@@ -220,6 +220,10 @@ static InterpretResult run() {
 				vm.ip -= offset;
 				break;
 			}
+			case OP_DUPLICATE: {
+				push(peek(0));
+				break;
+			}
 			case OP_RETURN: {
 				return INTERPRET_OK;
 			}
