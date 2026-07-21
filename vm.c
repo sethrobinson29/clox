@@ -7,8 +7,11 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 VM vm;
+
+static Value clockNative(int argCount, Value *args) { return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC); }
 
 static void resetStack() {
 	vm.stackTop = vm.stack;
@@ -36,11 +39,21 @@ static void runtimeError(const char *format, ...) {
 	resetStack();
 }
 
+static void defineNative(const char *name, NativeFn function, int arity) {
+	push(OBJ_VAL(copyString(name, (int)strlen(name))));
+	push(OBJ_VAL(newNative(function, arity)));
+	tableSet(&vm.globals, vm.stack[0], vm.stack[1]);
+	pop();
+	pop();
+}
+
 void initVM() {
 	resetStack();
 	vm.objects = NULL;
 	initTable(&vm.globals);
 	initTable(&vm.strings);
+
+	defineNative("clock", clockNative, 0);
 }
 
 void freeVM() {
@@ -82,8 +95,21 @@ static bool call(ObjFunction *function, int argCount) {
 static bool callValue(Value callee, int argCount) {
 	if (IS_OBJ(callee)) {
 		switch (OBJ_TYPE(callee)) {
-			case OBJ_FUNCTION:
+			case OBJ_FUNCTION: {
 				return call(AS_FUNCTION(callee), argCount);
+			}
+			case OBJ_NATIVE: {
+				ObjNative *native = AS_NATIVE(callee);
+				if (argCount != native->arity) {
+					runtimeError("Expected %d arguments but got %d.", native->arity, argCount);
+					return false;
+				}
+
+				Value result = native->function(argCount, vm.stackTop - argCount);
+				vm.stackTop -= argCount + 1;
+				push(result);
+				return true;
+			}
 			default:
 				break;	// Non-callable object type.
 		}
@@ -135,7 +161,7 @@ static InterpretResult run() {
 			printf(" ]");
 		}
 		printf("\n");
-		disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
+		disassembleInstruction(&frame->function->chunk, (int)(frame->ip - frame->function->chunk.code));
 #endif
 
 		uint8_t instruction;
@@ -163,7 +189,7 @@ static InterpretResult run() {
 			}
 			case OP_GET_LOCAL: {
 				uint8_t slot = READ_BYTE();
-				push(vm.stack[slot]);
+				push(frame->slots[slot]);
 				break;
 			}
 			case OP_SET_LOCAL: {
