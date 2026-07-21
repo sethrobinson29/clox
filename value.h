@@ -6,7 +6,11 @@
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;
 
-typedef enum { VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ } ValueType;
+typedef enum { VAL_BOOL, VAL_NIL, VAL_NUMBER, VAL_OBJ, VAL_ERROR } ValueType;
+
+typedef struct {
+	ObjString *message;
+} ErrorValue;
 
 typedef struct {
 	ValueType type;
@@ -14,6 +18,7 @@ typedef struct {
 		bool boolean;
 		double number;
 		Obj *obj;
+		ErrorValue error;
 	} as;
 } Value;
 
@@ -23,15 +28,18 @@ typedef struct {
 #define IS_NIL(value) ((value).type == VAL_NIL)
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
 #define IS_OBJ(value) ((value).type == VAL_OBJ)
+#define IS_ERROR(value) ((value).type == VAL_ERROR)
 
 #define AS_BOOL(value) ((value).as.boolean)
 #define AS_NUMBER(value) ((value).as.number)
 #define AS_OBJ(value) ((value).as.obj)
+#define AS_ERROR(value) ((value).as.error)
 
 #define BOOL_VAL(value) ((Value){VAL_BOOL, {.boolean = value}})
 #define NIL_VAL ((Value){VAL_NIL, {.number = 0}})
 #define NUMBER_VAL(value) ((Value){VAL_NUMBER, {.number = value}})
 #define OBJ_VAL(object) ((Value){VAL_OBJ, {.obj = (Obj *)object}})
+#define ERROR_VAL(err) ((Value){VAL_ERROR, {.error = (ErrorValue){.message = (err).message}}})
 
 typedef struct {
 	int capacity;

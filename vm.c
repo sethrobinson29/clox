@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "memory.h"
 #include "object.h"
+#include "value.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +12,17 @@
 
 VM vm;
 
+static Value handleNativeError(const char *message, int messageLen) {
+	return ERROR_VAL(((ErrorValue){.message = copyString(message, messageLen)}));
+}
+
 static Value clockNative(int argCount, Value *args) { return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC); }
+
+static Value lenNative(int argCount, Value *args) {
+	if (!IS_STRING(args[0])) { return handleNativeError("Argument must be a string.", 27); }
+
+	return NUMBER_VAL((double)AS_STRING(args[0])->length);
+}
 
 static void resetStack() {
 	vm.stackTop = vm.stack;
@@ -54,6 +65,7 @@ void initVM() {
 	initTable(&vm.strings);
 
 	defineNative("clock", clockNative, 0);
+	defineNative("len", lenNative, 1);
 }
 
 void freeVM() {
@@ -104,8 +116,13 @@ static bool callValue(Value callee, int argCount) {
 					runtimeError("Expected %d arguments but got %d.", native->arity, argCount);
 					return false;
 				}
-
+				// native functions implement their own error checking and use handleNativeError for returns
 				Value result = native->function(argCount, vm.stackTop - argCount);
+				if (IS_ERROR(result)) {
+					runtimeError("%s", AS_ERROR(result).message->chars);
+					return false;
+				}
+
 				vm.stackTop -= argCount + 1;
 				push(result);
 				return true;

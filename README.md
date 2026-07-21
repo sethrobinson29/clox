@@ -11,3 +11,4 @@ This repo implements the VM in C as the book does, while tackling some of the ch
 - Exposes hash tables to end users (eventually)
 	- Numbers, Booleans, nil, and Objects (eventually) as hash keys
 - Switch Statements
+- Native function error handling
