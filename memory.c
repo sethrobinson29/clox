@@ -25,6 +25,8 @@ static void freeObject(Obj *object) {
 			break;
 		}
 		case OBJ_CLOSURE: {
+			ObjClosure *closure = (ObjClosure *)object;
+			FREE_ARRAY(ObjUpvalue *, closure->upvalues, closure->upvalueCount);
 			FREE(ObjClosure, object);
 			break;
 		}
@@ -32,6 +34,10 @@ static void freeObject(Obj *object) {
 			ObjFunction *function = (ObjFunction *)object;
 			freeChunk(&function->chunk);
 			FREE(ObjFunction, object);
+			break;
+		}
+		case OBJ_UPVALUE: {
+			FREE(ObjUpvalue, object);
 			break;
 		}
 	}
