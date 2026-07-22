@@ -122,6 +122,7 @@ static TokenType identifierType() {
 						return checkKeyword(2, 2, "se", TOKEN_CASE);
 				}
 			}
+			break;
 		case 'd':
 			return checkKeyword(1, 6, "efault", TOKEN_DEFAULT);
 		case 'e':
@@ -157,6 +158,7 @@ static TokenType identifierType() {
 						return checkKeyword(2, 4, "itch", TOKEN_SWITCH);
 				}
 			}
+			break;
 		case 't':
 			if (scanner.current - scanner.start > 1) {
 				switch (scanner.start[1]) {

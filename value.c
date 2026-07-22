@@ -40,6 +40,10 @@ void printValue(Value value) {
 			printf("%g", AS_NUMBER(value));
 			break;
 		}
+		case VAL_ERROR: {
+			printf("<error: %s>", AS_ERROR(value).message->chars);
+			break;
+		}
 		case VAL_OBJ: {
 			printObject(value);
 			break;
@@ -62,8 +66,9 @@ bool valuesEqual(Value a, Value b) {
 		case VAL_OBJ: {
 			return AS_OBJ(a) == AS_OBJ(b);
 		}
+		case VAL_ERROR:
 		default: {
-			return false; // Unreachable.}
+			return false;  // Unreachable.}
 		}
 	}
 }

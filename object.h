@@ -22,6 +22,7 @@ typedef enum { OBJ_CLOSURE, OBJ_STRING, OBJ_NATIVE, OBJ_FUNCTION, OBJ_UPVALUE } 
 
 struct Obj {
 	ObjType type;
+	bool isMarked;
 	struct Obj *next;
 };
 

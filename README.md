@@ -9,6 +9,6 @@ This repo implements the VM in C as the book does, while tackling some of the ch
 
 - String Interpolation
 - Exposes hash tables to end users (eventually)
-	- Numbers, Booleans, nil, and Objects (eventually) as hash keys
+	- Strings, Numbers, Booleans, and Objects (eventually) as hash keys
 - Switch Statements
 - Native function error handling

@@ -16,9 +16,14 @@ static Value handleNativeError(const char *message, int messageLen) {
 	return ERROR_VAL(((ErrorValue){.message = copyString(message, messageLen)}));
 }
 
-static Value clockNative(int argCount, Value *args) { return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC); }
+static Value clockNative(int argCount, Value *args) {
+	(void)argCount;
+	(void)args;
+	return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
 
 static Value lenNative(int argCount, Value *args) {
+	(void)argCount;
 	if (!IS_STRING(args[0])) { return handleNativeError("Argument must be a string.", 27); }
 
 	return NUMBER_VAL((double)AS_STRING(args[0])->length);
@@ -62,6 +67,11 @@ static void defineNative(const char *name, NativeFn function, int arity) {
 void initVM() {
 	resetStack();
 	vm.objects = NULL;
+
+	vm.grayCount = 0;
+	vm.grayCapacity = 0;
+	vm.grayStack = NULL;
+
 	initTable(&vm.globals);
 	initTable(&vm.strings);
 
