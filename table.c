@@ -32,7 +32,12 @@ static uint32_t hashValue(Value value) {
 			return (uint32_t)(bits ^ (bits >> 32));
 		}
 		case VAL_OBJ: {
-			return AS_STRING(value)->hash;
+			switch (OBJ_TYPE(value)) {
+				case OBJ_STRING:
+					return AS_STRING(value)->hash;
+				default:
+					return (uint32_t)(uintptr_t)AS_OBJ(value);
+			}
 		}
 		default: {
 			return 0;
